@@ -63,6 +63,11 @@ public class GameController : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.Space))
             dropEntirely();
+        
+        if(Input.GetKeyDown(KeyCode.DownArrow)){
+            dropGroup();
+            fallTimePased = 0;
+        }
 
         fallTimePased += Time.deltaTime;
 
@@ -72,7 +77,7 @@ public class GameController : MonoBehaviour
             dropGroup();
         }
 
-        lockTimeUpdate();
+        lockTimeUpdate(false);
     }
 
     public void setCurrentGroup(GameObject group){
@@ -235,10 +240,11 @@ public class GameController : MonoBehaviour
         }
 
         currentGroup.GetComponent<Transform>().position += new Vector3(0,-.4f*(i-2),0);
-        gridUpdate();
+        lockStart = true;
+        lockTimeUpdate(true);
     }
     
-    void lockTimeUpdate(){
+    void lockTimeUpdate(bool instant){
         if(!lockStart)
             return;
 
@@ -250,22 +256,37 @@ public class GameController : MonoBehaviour
             lockStart = false;
             lockTime = 0;
         }
+
+        if(instant){
+            gridUpdate();
+            lockStart = false;
+            lockTime = 0;
+        }
     } 
      
-    void gridUpdate(){
-        foreach(Transform block in allBlocks){
-            Vector2 position = block.position;
+    void gridUpdate(bool spawnNew = false){
 
+        grid = new bool[10,20];
+
+        GameObject[] blocks = GameObject.FindGameObjectsWithTag("Block");
+
+        foreach(GameObject block in blocks){
+            Vector2 position = block.GetComponent<Transform>().position;
             int x = Mathf.RoundToInt((position.x+1.8f)/.4f);
             int y = Mathf.RoundToInt((position.y+3.8f)/.4f);
             
             try{
                 grid[x,y] = true;
+                Debug.Log("Grid Update: " + x + "," + y);
             }catch(Exception){}
         }
 
-        clearLines();
-        spawner.MakeBlock();
+        if(spawnNew){
+            spawner.MakeBlock();
+        }else{
+            clearLines();
+        }
+
     }
 
     void clearLines(){
@@ -277,32 +298,25 @@ public class GameController : MonoBehaviour
             for(j = 0; j < 10; j++){
                 if(!grid[j,i]) break;
             }
-            if(j == 9){
+            if(j == 10){
                 foreach(GameObject position in blocks){
                     int y = Mathf.RoundToInt((position.GetComponent<Transform>().position.y+3.8f)/.4f);
                     if(y == i){
                         GameObject.Destroy(position);
+                        Debug.Log("Destroying");
+                    }else if(y > i){
+                        position.transform.position += new Vector3(0,-.4f,0);
+                        Debug.Log("here");
                     }
                 }
             }
-            
-
-
         }
+
+        gridUpdate(true);
+
     }
 }
 
     
      
-     
-     /*
-    Spawn: only if isPlaced = true -> isPlaced = false & spawn block
-    Fall: Every Delta Seconds, Drop group by 1 if there are no blocks below it
-
-    Grid: a 10x20 array, 
-        array -> position: x is dilated by .4 + (-1.8), y is dilated by .4 + 3.8
-
-    Update every delta Seconds, drop each block by 1 only if there are no blocks below it
-
-    */
 
