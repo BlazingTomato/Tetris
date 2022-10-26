@@ -87,7 +87,6 @@ public class GameController : MonoBehaviour
         allBlocks = currentGroup.GetComponentsInChildren<Transform>();
     }
 
-    #region Movement Methods
     //get lowest blocks for each x value
     void dropGroup(){
         bool canMove = true;
@@ -254,6 +253,7 @@ public class GameController : MonoBehaviour
         lockStart = true;
         lockTimeUpdate(true);
     }
+<<<<<<< HEAD:Tetris/Assets/GameController.cs
 
     
     public void makeDropImage(){
@@ -292,6 +292,9 @@ public class GameController : MonoBehaviour
     } 
     #endregion
 
+=======
+    
+>>>>>>> parent of 48918ec (Base Game Finished):My project/Assets/GameController.cs
     void lockTimeUpdate(bool instant){
         if(!lockStart)
             return;
@@ -325,12 +328,15 @@ public class GameController : MonoBehaviour
             
             try{
                 grid[x,y] = true;
-                //Debug.Log("Grid Update: " + x + "," + y);
+                Debug.Log("Grid Update: " + x + "," + y);
             }catch(Exception){}
         }
 
-
+        if(spawnNew){
+            spawner.MakeBlock();
+        }else{
             clearLines();
+        }
 
     }
 
@@ -338,42 +344,37 @@ public class GameController : MonoBehaviour
         GameObject[] blocks = GameObject.FindGameObjectsWithTag("Block");
 
         for(int i = 0; i < 20; i++){
-            for(int j = 0; j < 10; j++){
-                if(!grid[j,i])
-                    break;
+            int j = 0;
 
-                if(j == 9){
-                    foreach(GameObject block in blocks){
-                        Vector2 position = block.GetComponent<Transform>().position;
-                        int x = Mathf.RoundToInt((position.x+1.8f)/.4f);
-                        int y = Mathf.RoundToInt((position.y+3.8f)/.4f);
-                        if(y == i){
-                            grid[x,y] = false;
-                            GameObject.Destroy(block);
-                        }   
+            for(j = 0; j < 10; j++){
+                if(!grid[j,i]) break;
+            }
+            if(j == 10){
+                foreach(GameObject position in blocks){
+                    int y = Mathf.RoundToInt((position.GetComponent<Transform>().position.y+3.8f)/.4f);
+                    if(y == i){
+                        GameObject.Destroy(position);
+                        Debug.Log("Destroying");
+                    }else if(y > i){
+                        position.transform.position += new Vector3(0,-.4f,0);
+                        Debug.Log("here");
                     }
-
-                    foreach(GameObject block in blocks){
-                        Vector2 position = block.GetComponent<Transform>().position;
-                        int x = Mathf.RoundToInt((position.x+1.8f)/.4f);
-                        int y = Mathf.RoundToInt((position.y+3.8f)/.4f);
-
-                        if(y > i){
-                            grid[x,y] = false;
-                            block.transform.position += new Vector3(0,-.4f,0);
-                            grid[x,y-1] = true;
-                        }
-                    }
-                    i--;
                 }
             }
         }
+<<<<<<< HEAD:Tetris/Assets/GameController.cs
        
         spawner.MakeBlock();
         makeDropImage();
+=======
+
+        gridUpdate(true);
+
+>>>>>>> parent of 48918ec (Base Game Finished):My project/Assets/GameController.cs
     }
 
 }
 
     
      
+
