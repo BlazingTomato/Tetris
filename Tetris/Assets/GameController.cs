@@ -16,6 +16,8 @@ public class GameController : MonoBehaviour
 
     [SerializeField]
     GameObject currentGroup;
+    [SerializeField]
+    GameObject dropImage;
     public Spawner spawner;
 
     [SerializeField]
@@ -108,8 +110,10 @@ public class GameController : MonoBehaviour
             currentGroup.GetComponent<Transform>().position += new Vector3(0,-.4f,0);
         else
             lockStart = true;
+        
+        makeDropImage();
     }
-    
+   
     void tryMoveLeft(){
         bool canMove = true;
         
@@ -131,6 +135,7 @@ public class GameController : MonoBehaviour
            currentGroup.GetComponent<Transform>().position += new Vector3(-.4f,0f,0);
         }
 
+        makeDropImage();
     }
 
     void tryMoveRight(){
@@ -154,6 +159,7 @@ public class GameController : MonoBehaviour
             currentGroup.GetComponent<Transform>().position += new Vector3(.4f,0f,0);
         }
 
+        makeDropImage();
     }
 
     void tryCCW(){
@@ -184,6 +190,8 @@ public class GameController : MonoBehaviour
                 block.GetComponent<Transform>().position = newPosition;
             }
         }
+
+        makeDropImage();
     }
 
     void tryCW(){
@@ -214,6 +222,8 @@ public class GameController : MonoBehaviour
                 block.GetComponent<Transform>().position = newPosition;
             }
         }
+
+        makeDropImage();
     }
    
     void dropEntirely(){
@@ -244,6 +254,42 @@ public class GameController : MonoBehaviour
         lockStart = true;
         lockTimeUpdate(true);
     }
+
+    
+    public void makeDropImage(){
+        GameObject.Destroy(dropImage);
+
+        int i = 100;
+        foreach(Transform block in allBlocks){
+            Vector2 currentPosition = block.position;
+
+            int x = Mathf.RoundToInt((currentPosition.x+1.8f)/.4f);
+            int y = Mathf.RoundToInt((currentPosition.y+3.8f)/.4f);
+
+            bool canMove = true;
+            int j = 0;
+
+            while(canMove){
+                try{
+                    if(grid[x,y-j]) canMove = false;
+                }catch(Exception){
+                    canMove = false;
+                }
+                j++;
+            }
+            
+            i = Math.Min(i,j);
+        }
+
+        
+        Vector2 position = currentGroup.GetComponent<Transform>().position + new Vector3(0,-.4f*(i-2),0);
+
+        dropImage = GameObject.Instantiate(currentGroup,position,Quaternion.identity);
+
+        foreach(SpriteRenderer spriteRenderer in dropImage.GetComponentsInChildren<SpriteRenderer>()){
+            spriteRenderer.color -= new Color32(0,0,0,110);
+        }
+    } 
     #endregion
 
     void lockTimeUpdate(bool instant){
@@ -324,8 +370,9 @@ public class GameController : MonoBehaviour
         }
        
         spawner.MakeBlock();
-
+        makeDropImage();
     }
+
 }
 
     

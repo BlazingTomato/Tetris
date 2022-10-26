@@ -13,13 +13,18 @@ public class Spawner : MonoBehaviour
     
 
     //spawn position in grid = 4,18
-    [ContextMenu("Make Block")]
     public void MakeBlock(){
         GameObject gameObject = Instantiate(groups[Random.Range(0,7)], SpawnPosition.transform.position, Quaternion.identity);
         gameObject.transform.parent = SpawnPosition.transform;
 
         gameController.setCurrentGroup(gameObject);
     }
+    
+    private void Update() {
+        
+    }
+
+
 
 
 }
